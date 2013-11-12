@@ -18,39 +18,58 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + '/../ruby'))
 
-$LOAD_PATH.unshift( File.expand_path( File.dirname( __FILE__ ) + "/../ruby" ) )
+require 'optparse'
+require 'trema/path'
 
+module Trema
+  # Trema gcc helper.
+  class TremaConfig
+    def initialize(argv = ARGV)
+      @argv = argv.dup
+      @flag = {}
+      @option = OptionParser.new
+      define_commandline_options
+    end
 
-require "fileutils"
-require "optparse"
-require "trema/path"
+    def run
+      parse_argv
+      show_gcc_options
+    end
 
+    private
 
-$opts = OptionParser.new
+    def define_commandline_options
+      @option.banner = "Usage: #{File.basename $PROGRAM_NAME} [OPTIONS ...]"
+      @option.on('-c', '--cflags') do
+        @flag[:cflags] = true
+      end
+      @option.on('-l', '--libs') do
+        @flag[:libs] = true
+      end
+    end
 
-FileUtils.cd Trema.home do
-  $opts.banner = "Usage: #{ File.basename $0 } [OPTIONS ...]"
+    def parse_argv
+      @option.parse! @argv
+    end
 
-  $opts.on( "-c", "--cflags" ) do
-    $cflags = true
+    def show_gcc_options
+      out = []
+      out << "-I#{Trema.source}/src/lib -I#{Trema.openflow}" if @flag[:cflags]
+      out << "-L#{Trema.objects}/lib #{libraries.join ' '}" if @flag[:libs]
+      print out.join(' ')
+    end
+
+    def libraries
+      %w(trema rt pthread sqlite3 dl).map do |each|
+        "-l#{each}"
+      end
+    end
   end
-  $opts.on( "-l", "--libs" ) do
-    $libs = true
-  end
-
-  $opts.parse! ARGV
-
-  output = []
-  if $cflags
-    output << "-I#{ Trema.home }/src/lib -I#{ Trema.openflow }"
-  end
-  if $libs
-    output << "-L#{ Trema.objects }/lib -ltrema -lrt -lpthread -lsqlite3 -ldl"
-  end
-  print output.join( " " )
 end
 
+Trema::TremaConfig.new.run
 
 ### Local variables:
 ### mode: Ruby

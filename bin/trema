@@ -24,6 +24,10 @@ $LOAD_PATH.unshift File.expand_path( File.join File.dirname( __FILE__ ), "..", "
 require "rubygems"
 require "bundler/setup"
 
+require "trema/settings"
+settings = Trema::Settings.new
+settings.create_default unless FileTest.exist?(settings.config_file)
+
 require "gli"
 require "trema/command"
 require "trema/util"
@@ -264,11 +268,6 @@ class BinTrema
       end
 
       assert_trema_is_built
-
-      if FileTest.exist?( Trema.tmp ) and not FileTest.writable?( Trema.tmp )
-        # Trema is system widely installed with gem command
-        sh "sudo chmod o+w -R #{ Trema.tmp }"
-      end
 
       FileUtils.mkdir_p Trema.log
       FileUtils.mkdir_p Trema.pid

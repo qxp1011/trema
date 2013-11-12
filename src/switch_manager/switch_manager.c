@@ -253,7 +253,7 @@ absolute_path( const char *dir, const char *file ) {
 static void
 init_listener_info( struct listener_info *listener_info ) {
   memset( listener_info, 0, sizeof( struct listener_info ) );
-  listener_info->switch_daemon = xconcatenate_path( get_trema_home(), SWITCH_MANAGER_PATH );
+  listener_info->switch_daemon = xconcatenate_path( getenv("TREMA_SOURCE"), SWITCH_MANAGER_PATH );
   listener_info->listen_port = OFP_TCP_PORT;
   listener_info->listen_fd = -1;
   create_list( &listener_info->vendor_service_name_list );
