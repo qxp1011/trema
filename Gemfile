@@ -5,6 +5,7 @@ source "https://rubygems.org"
 gemspec
 
 # Add dependencies required to use your gem here.
+gem 'phuture', :github => 'trema/phuture', :branch => 'feature/phut_run'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
