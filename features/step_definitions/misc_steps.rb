@@ -28,7 +28,7 @@ end
 
 When /^wait until "([^"]*)" is up$/ do | process |
   nloop = 0
-  pid_file = File.join( Trema.pid, "#{ process }.pid" )
+  pid_file = File.join( *@dirs, "tmp", "pid", "#{ process }.pid" )
   loop do
     nloop += 1
     raise "Timeout" if nloop > 60 # FIXME

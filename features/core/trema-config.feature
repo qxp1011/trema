@@ -1,3 +1,4 @@
+@guard
 Feature: trema-config command
 
   In order to specify C compiler options easily

@@ -9,11 +9,11 @@ Feature: "Hello Trema!" example
   or C. Hence it's a good starting point to learn about Trema programming.
 
   Background:
-    Given I cd to "../../src/examples/hello_trema/"
+    Given the current example directory is "hello_trema"
 
   @slow_process
   Scenario: Run the Ruby example
-    When I run `trema run ./hello-trema.rb -c sample.conf` interactively
+    When I run `trema run hello-trema.rb -c sample.conf` interactively
     Then the output should contain "Hello 0xabc!" within the timeout period
 
   @slow_process

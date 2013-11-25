@@ -17,15 +17,18 @@
 
 
 require "trema/monkey-patch/module"
+require "trema/settings"
 
 
 module Trema
-  HOME = File.expand_path( File.join( File.dirname( __FILE__ ), "..", ".." ) )
-
-
   class << self
+    def source
+      File.expand_path File.join(File.dirname(__FILE__), "..", "..")
+    end
+
+
     def home
-      HOME
+      Trema.settings['TREMA_HOME']
     end
 
 
@@ -52,10 +55,10 @@ module Trema
   end
 
 
-  dir :home, "objects"
-  dir :home, "ruby"
-  dir :home, "src/lib", :include
-  dir :home, "vendor"
+  dir :source, "objects"
+  dir :source, "ruby"
+  dir :source, "src/lib", :include
+  dir :source, "vendor"
   dir :objects, "cmockery"
   dir :objects, "lib"
   dir :objects, "oflops"

@@ -27,15 +27,8 @@ require "trema/path"
 
 task :default => :build_trema
 
-directory Trema.log
-directory Trema.pid
-directory Trema.sock
-
 desc "Build Trema"
 task :build_trema => [
-  Trema.log,
-  Trema.pid,
-  Trema.sock,
   :management_commands,
   :rubylib,
   :switch_manager,
@@ -84,7 +77,7 @@ desc "Build Trema C library (coverage)."
 task "libtrema:gcov" => [ "vendor:openflow" ]
 PaperHouse::StaticLibraryTask.new "libtrema:gcov" do | task |
   task.library_name = "libtrema"
-  task.target_directory = "#{ Trema.home }/objects/unittests"
+  task.target_directory = "#{ Trema.source }/objects/unittests"
   task.sources = "#{ Trema.include }/*.c"
   task.includes = [ Trema.openflow ]
   task.cflags = [ "--coverage" ] + CFLAGS
@@ -263,7 +256,7 @@ task "vendor:openvswitch" => Trema::Executables.ovs_openflowd
 file Trema::Executables.ovs_openflowd do
   sh "tar xzf #{ Trema.vendor_openvswitch }.tar.gz -C #{ Trema.vendor }"
   cd Trema.vendor_openvswitch do
-    sh "./configure --prefix=#{ Trema.openvswitch } --with-rundir=#{ Trema.sock }"
+    sh "./configure --prefix=#{ Trema.openvswitch }"
     sh "make install"
     cp "./tests/test-openflowd", Trema::Executables.ovs_openflowd
   end
@@ -820,7 +813,7 @@ libtrema_unit_tests.keys.each do | each |
     task name => [ "vendor:cmockery", "vendor:openflow", "objects/unittests" ]
 
     task.executable_name = each.to_s
-    task.target_directory = File.join( Trema.home, "unittests/objects" )
+    task.target_directory = File.join( Trema.source, "unittests/objects" )
     task.sources = test_c_files( each ) + [ "unittests/lib/#{ each }.c" ]
     task.includes = [ Trema.include, Trema.openflow, File.dirname( Trema.cmockery_h ), "unittests" ]
     task.cflags = [ "-DUNIT_TESTING", "--coverage", CFLAGS ]
@@ -867,7 +860,7 @@ $tests.each do | _each |
   task "unittests:#{ each }" => [ "libtrema:gcov", "vendor:cmockery" ]
   PaperHouse::ExecutableTask.new "unittests:#{ each }" do | task |
     task.executable_name = each.to_s
-    task.target_directory = File.join( Trema.home, "unittests/objects" )
+    task.target_directory = File.join( Trema.source, "unittests/objects" )
     task.sources = [ "unittests/lib/#{ each }.c", "unittests/cmockery_trema.c" ]
     task.includes = [ Trema.include, Trema.openflow, File.dirname( Trema.cmockery_h ), "unittests" ]
     task.cflags = [ "--coverage", CFLAGS ]

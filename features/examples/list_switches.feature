@@ -5,7 +5,8 @@ Feature: "List Switches" sample application
   I want to execute "List Switches" sample application
 
   Background:
-    Given a file named "list_switches.conf" with:
+    Given the current example directory is "list_switches"
+    And a file named "list_switches.conf" with:
       """
       vswitch { datapath_id 0x1 }
       vswitch { datapath_id 0x2 }
@@ -14,11 +15,12 @@ Feature: "List Switches" sample application
       """
 
   @slow_process
-  Scenario: Run "List Switches" C example
-    Given I run `trema run ../../objects/examples/list_switches/list_switches -c list_switches.conf`
-    Then the file "../../tmp/log/list_switches.log" should contain "switches = 0x1, 0x2, 0x3, 0x4"
+  Scenario: Run the C example
+    Given I compile "list_switches.c" into "list_switches"
+    When I run `trema run ./list_switches -c list_switches.conf`
+    Then the file "tmp/log/list_switches.log" should contain "switches = 0x1, 0x2, 0x3, 0x4"
 
   @slow_process
   Scenario: Run "List Switches" Ruby example
-    Given I run `trema run ../../src/examples/list_switches/list-switches.rb -c list_switches.conf`
-    Then the file "../../tmp/log/ListSwitches.log" should contain "switches = 0x1, 0x2, 0x3, 0x4"
+    Given I run `trema run list-switches.rb -c list_switches.conf`
+    Then the file "tmp/log/ListSwitches.log" should contain "switches = 0x1, 0x2, 0x3, 0x4"

@@ -26,7 +26,8 @@ require "trema/process"
 
 module Trema::Util
   def sh cmd
-    ENV[ "TREMA_HOME" ] = Trema.home
+    ENV[ "TREMA_SOURCE" ] = Trema.source
+    ENV[ "TREMA_HOME" ] = Trema.settings['TREMA_HOME']
     puts cmd if $verbose
     unless system( cmd )
       raise "Command '#{ cmd }' failed!"

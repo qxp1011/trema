@@ -5,7 +5,8 @@ Feature: "Dumper" sample application
   I want to execute "Dumper" sample application
 
   Background:
-    Given a file named "dumper.conf" with:
+    Given the current example directory is "dumper"
+    And a file named "dumper.conf" with:
       """
       vswitch("dumper") { datapath_id 0xabc }
 
@@ -17,22 +18,23 @@ Feature: "Dumper" sample application
       """
 
   @slow_process
-  Scenario: Run "Dumper" C example
-    Given I run `trema run ../../objects/examples/dumper/dumper -c dumper.conf -d`
-     And wait until "dumper" is up
+  Scenario: Run the C example
+    Given I compile "dumper.c" into "dumper"
+    And I run `trema run ./dumper -c dumper.conf -d`
+    And wait until "dumper" is up
     When I send 1 packet from host1 to host2
-    Then the file "../../tmp/log/dumper.log" should contain "[switch_ready]"
-     And the file "../../tmp/log/dumper.log" should contain "[packet_in]"
-     And the file "../../tmp/log/dumper.log" should contain "datapath_id: 0xabc"
+    Then the file "tmp/log/dumper.log" should contain "[switch_ready]"
+    And the file "tmp/log/dumper.log" should contain "[packet_in]"
+    And the file "tmp/log/dumper.log" should contain "datapath_id: 0xabc"
 
   @slow_process
-  Scenario: Run "Dumper" Ruby example
-    Given I run `trema run ../../src/examples/dumper/dumper.rb -c dumper.conf -d`
-     And wait until "Dumper" is up
+  Scenario: Run the Ruby example
+    Given I run `trema run dumper.rb -c dumper.conf -d`
+    And wait until "Dumper" is up
     When I send 1 packet from host1 to host2
-    Then the file "../../tmp/log/Dumper.log" should contain "[switch_ready]"
-     And the file "../../tmp/log/Dumper.log" should contain "[packet_in]"
-     And the file "../../tmp/log/Dumper.log" should contain "datapath_id: 0xabc"
+    Then the file "tmp/log/Dumper.log" should contain "[switch_ready]"
+    And the file "tmp/log/Dumper.log" should contain "[packet_in]"
+    And the file "tmp/log/Dumper.log" should contain "datapath_id: 0xabc"
 
   Scenario: "dumper --help"
     When I run `../../objects/examples/dumper/dumper --help`
