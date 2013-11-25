@@ -20,7 +20,7 @@ require "trema/app"
 require "trema/default-logger"
 require "trema/monkey-patch/integer"
 require "trema/monkey-patch/string"
-require "trema/timers"
+require "trema/timer"
 
 
 module Trema
@@ -29,7 +29,7 @@ module Trema
   #
   class Controller < App
     include DefaultLogger
-    include Timers
+    include Timer
 
 
     #

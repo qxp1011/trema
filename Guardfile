@@ -6,3 +6,9 @@ guard :bundler do
   # Uncomment next line if your Gemfile contains the `gemspec' command.
   watch(/^.+\.gemspec/)
 end
+
+guard :rspec do
+  watch(%r{^spec/trema/.+_spec\.rb$})
+  watch(%r{^ruby/trema/(.+)\.rb$})     { |m| "spec/trema/#{m[1]}_spec.rb" }
+  watch('spec/spec_helper.rb')  { "spec" }
+end
