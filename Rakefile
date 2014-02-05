@@ -1032,6 +1032,23 @@ end
 
 
 ################################################################################
+# Trema Ruby
+################################################################################
+
+desc 'Build test_list_switches.'
+task :test_list_switches => 'libtrema:static'
+
+PaperHouse::ExecutableTask.new(:test_list_switches) do | task |
+  task.target_directory = Trema.objects
+  task.sources = ['src/test_list_switches.c']
+  task.includes = [Trema.include, Trema.openflow]
+  task.cflags = CFLAGS
+  task.ldflags = "-L#{ Trema.lib }"
+  task.library_dependencies = ['trema', 'sqlite3', 'pthread', 'rt', 'dl' ]
+end
+
+
+################################################################################
 # YARD
 ################################################################################
 

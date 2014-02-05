@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require 'pathname'
+
+ENV['TREMA_HOME'] = Pathname(__dir__).join('..').to_s
+system Pathname(__dir__).join('..', 'objects', 'test_list_switches').to_s
