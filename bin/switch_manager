@@ -1,0 +1,105 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+
+$LOAD_PATH << Pathname(__dir__).join('..', 'ruby').to_s
+
+require 'fileutils'
+require 'socket'
+require 'stringio'
+require 'trema/list_switches_reply'
+require 'trema/message'
+
+class SwitchManager
+  def initialize
+    Thread.abort_on_exception = true
+    @dpids = []
+    @messenger_read_buffer = StringIO.new('')
+    @messenger_server = Socket.new(:UNIX, :SOCK_SEQPACKET, 0)
+  end
+
+  def start
+    @switch_manager = TCPServer.open("<any>", 6653)
+    @messenger_server.bind(Addrinfo.unix(socket_file('switch_manager')))
+    @messenger_server.listen(Socket::SOMAXCONN)
+    begin
+      loop do
+        rs, = IO.select([@switch_manager, @messenger_server])
+        if rs[0] === @switch_manager
+          start_switch_manager
+        else
+          start_messenger_server
+        end
+      end
+    ensure
+      @messenger_server.close
+      FileUtils.rm_f socket_file('switch_manager')
+    end
+  end
+
+  private
+
+  def start_switch_manager
+    Thread.start(@switch_manager.accept) do |client|
+      sin_port, sin_addr = Socket.unpack_sockaddr_in(client.getpeername)
+      switchd = Pathname(__dir__).join('..', 'objects', 'switch_manager', 'switch').to_s
+      switchd_name = "switch.#{sin_addr}:#{sin_port}"
+
+      pid = spawn({'TREMA_HOME' => Pathname(__dir__).join('..').to_s},
+                  [switchd, switchd_name],
+                  "--name=#{switchd_name}",
+                  "--socket=#{client.fileno}",
+                  "--daemonize",
+                  "vendor::hoge",
+                  "packet_in::hoge",
+                  "port_status::hoge",
+                  "state_notify::hoge",
+                  client => client)
+      Process.detach(pid)
+      client.close
+    end
+  end
+
+  def start_messenger_server
+    Thread.start(@messenger_server.accept) do |switchd,|
+      loop do
+        request = read_from(switchd)
+          
+        case request.message_type
+        when MESSAGE_TYPE_NOTIFY
+          add_dpid request.datapath_id
+        when MESSAGE_TYPE_REQUEST
+          send_list_switches_reply(request.transaction_id, request.service_name)
+        else
+          fail "Unkonown message type: #{request.message_type}"
+        end
+      end
+    end
+  end
+
+  def read_from(switchd)
+    if @messenger_read_buffer.eof?
+      binary, = switchd.recvfrom(100000)
+      @messenger_read_buffer = StringIO.new(binary)
+    end
+    Message.read(@messenger_read_buffer)
+  end
+
+  def socket_file(service_name)
+    Pathname(__dir__).join('..', 'tmp', 'sock', "trema.#{service_name}.sock").to_s
+  end
+
+  def add_dpid(dpid)
+    @dpids << dpid unless @dpids.include?(dpid)
+  end
+
+  def send_list_switches_reply(transaction_id, service_name)
+    switchd = Socket.new(:UNIX, :SOCK_SEQPACKET, 0)
+    reply = ListSwitchesReply.new(:transaction_id => transaction_id, :dpids => @dpids)
+    reply.header.assign(:message_type => MESSAGE_TYPE_REPLY, :tag => 0, :message_length => reply.num_bytes)
+    switchd.connect(Addrinfo.unix(socket_file(service_name)))
+    switchd.write(reply.to_binary_s)
+  end
+end
+
+SwitchManager.new.start

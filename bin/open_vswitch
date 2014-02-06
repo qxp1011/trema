@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+
+$LOAD_PATH << Pathname(__dir__).join('..', 'ruby').to_s
+
+gem 'pio'
+require 'trema'
+require 'trema/dsl'
+
+stanza = Trema::DSL::Vswitch.new('vswitch')
+stanza.dpid 0xabc
+
+vswitch = Trema::OpenVswitch.new(stanza)
+command = vswitch.__send__(:command)
+$stderr.puts command
+system command
