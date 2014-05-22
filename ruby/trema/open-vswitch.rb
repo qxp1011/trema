@@ -16,6 +16,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+require 'phut'
 require 'trema/default_openflow_channel_port'
 require 'trema/daemon'
 require 'trema/executables'
@@ -97,7 +98,7 @@ module Trema
     private
 
     def command
-      "sudo #{ Executables.ovs_openflowd } #{ options }"
+      "sudo #{Phut::OpenVswitch::OPENFLOWD} #{options}"
     end
 
     def options

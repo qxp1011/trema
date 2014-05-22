@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+require 'phut'
 require 'trema/executables'
 require 'trema/flow'
 
@@ -29,7 +30,7 @@ module Trema
       option_string = options.collect do | k, v |
         "#{ k }=#{ v }"
       end.join(',')
-      sh "sudo #{ Executables.ovs_ofctl } add-flow #{ switch.network_device } #{ option_string },actions=#{ actions } 2>/dev/null"
+      sh "sudo #{Phut::OpenVswitch::OFCTL} add-flow #{ switch.network_device } #{ option_string },actions=#{ actions } 2>/dev/null"
     end
 
     def flows(switch)
@@ -43,15 +44,15 @@ module Trema
     end
 
     def dump_flows(switch)
-      `sudo #{ Executables.ovs_ofctl } dump-flows #{ switch.network_device } 2>&1`
+      `sudo #{Phut::OpenVswitch::OFCTL} dump-flows #{ switch.network_device } 2>&1`
     end
 
     def bring_port_up(switch, port_number)
-      `sudo #{ Executables.ovs_ofctl } mod-port #{ switch.network_device } #{ port_number } up 2>&1`
+      `sudo #{Phut::OpenVswitch::OFCTL} mod-port #{ switch.network_device } #{ port_number } up 2>&1`
     end
 
     def bring_port_down(switch, port_number)
-      `sudo #{ Executables.ovs_ofctl } mod-port #{ switch.network_device } #{ port_number } down 2>&1`
+      `sudo #{Phut::OpenVswitch::OFCTL} mod-port #{ switch.network_device } #{ port_number } down 2>&1`
     end
   end
 end

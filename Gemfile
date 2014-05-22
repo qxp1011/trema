@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 gemspec
 
 # Add dependencies required to use your gem here.
+gem 'phut', github: 'trema/phut', branch: 'develop'
 
 group :docs do
   gem 'relish', '~> 0.7'
