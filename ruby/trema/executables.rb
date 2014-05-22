@@ -71,8 +71,6 @@ class Trema::Executables
     end
   end
 
-  path 'openvswitch/bin/ovs-ofctl'
-  path 'openvswitch/bin/ovs-openflowd'
   path 'packetin_filter/packetin_filter'
   path 'phost/cli'
   path 'phost/phost'

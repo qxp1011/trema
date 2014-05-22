@@ -23,8 +23,6 @@ describe Trema::Executables do
   subject { Trema::Executables }
 
   its(:cli) { should be_a(String) }
-  its(:ovs_ofctl) { should be_a(String) }
-  its(:ovs_openflowd) { should be_a(String) }
   its(:packet_capture) { should be_a(String) }
   its(:packetin_filter) { should be_a(String) }
   its(:phost) { should be_a(String) }

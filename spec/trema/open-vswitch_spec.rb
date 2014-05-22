@@ -86,7 +86,7 @@ module Trema
 
       it 'should execute ovs openflowd' do
         subject.should_receive(:sh).with do | command |
-          expect(command).to include(Executables.ovs_openflowd)
+          expect(command).to include('openflowd')
         end
 
         subject.run!

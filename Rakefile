@@ -216,26 +216,8 @@ CLOBBER.include(Trema.phost) if FileTest.exists?(Trema.phost)
 task :vendor => [
   'vendor:oflops',
   'vendor:openflow',
-  'vendor:openvswitch',
   'vendor:phost'
 ]
-
-################################################################################
-# Build Open vSwitch
-################################################################################
-
-task 'vendor:openvswitch' => Trema::Executables.ovs_openflowd
-file Trema::Executables.ovs_openflowd do
-  sh "tar xzf #{ Trema.vendor_openvswitch }.tar.gz -C #{ Trema.vendor }"
-  cd Trema.vendor_openvswitch do
-    sh "./configure --prefix=#{ Trema.openvswitch } --with-rundir=#{ Trema.sock }"
-    sh 'make install'
-    cp './tests/test-openflowd', Trema::Executables.ovs_openflowd
-  end
-end
-
-CLEAN.include(Trema.vendor_openvswitch) if FileTest.exists?(Trema.vendor_openvswitch)
-CLOBBER.include(Trema.openvswitch) if FileTest.exists?(Trema.openvswitch)
 
 ################################################################################
 # Build packetin filter
